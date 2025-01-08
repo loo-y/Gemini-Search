@@ -5,6 +5,26 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+import dotenv from 'dotenv';
+dotenv.config();
+import nodeFetch, { RequestInit } from 'node-fetch'
+
+import {
+  bootstrap
+} from 'global-agent';
+
+// 注入 global-agent
+bootstrap()
+console.log(`process.env.GLOBAL_AGENT_HTTP_PROXY`, process.env.GLOBAL_AGENT_HTTP_PROXY);
+
+const originalFetch = global.fetch; // 保存原始的fetch
+// 重写fetch才能命中global-agent
+// @ts-ignore
+global.fetch = async (url: string, options: RequestInit = {}) => {
+  return nodeFetch(url, options);
+};
+
+
 // Setup environment variables first
 const env = setupEnvironment();
 console.log("\n--- Environment Setup Debug ---");

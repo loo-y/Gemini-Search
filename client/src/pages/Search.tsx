@@ -30,7 +30,13 @@ export function Search() {
     queryKey: ['search', searchQuery, refetchCounter],
     queryFn: async () => {
       if (!searchQuery) return null;
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`/api/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
       if (!response.ok) throw new Error('Search failed');
       const result = await response.json();
       console.log('Search API Response:', JSON.stringify(result, null, 2));
@@ -51,7 +57,13 @@ export function Search() {
   const followUpMutation = useMutation({
     mutationFn: async (followUpQuery: string) => {
       if (!sessionId) {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(followUpQuery)}`);
+        const response = await fetch(`/api/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query: followUpQuery }),
+        });
         if (!response.ok) throw new Error('Search failed');
         const result = await response.json();
         console.log('New Search API Response:', JSON.stringify(result, null, 2));
@@ -76,7 +88,13 @@ export function Search() {
       
       if (!response.ok) {
         if (response.status === 404) {
-          const newResponse = await fetch(`/api/search?q=${encodeURIComponent(followUpQuery)}`);
+          const newResponse = await fetch(`/api/search`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: followUpQuery }),
+          });
           if (!newResponse.ok) throw new Error('Search failed');
           const result = await newResponse.json();
           console.log('Fallback Search API Response:', JSON.stringify(result, null, 2));
